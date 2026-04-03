@@ -226,6 +226,7 @@
 <!-- TOC -->
 <div class="toc">
   <a href="#summary">Summary</a>
+  <a href="#differences">Differences from Original</a>
   <a href="#stats">Stats</a>
   <a href="#repo-glance">Repo at a Glance</a>
   <a href="#crate-map">Crate Map</a>
@@ -251,8 +252,35 @@
   </ul>
 </div>
 
+<!-- ─── 2. DIFFERENCES ─── -->
+<h2 id="differences">2. How This Differs from the Original Claude Code</h2>
+<div class="card">
+  <p>This repository is a <strong>clean-room rewrite</strong>, not a fork. The original Claude Code is a proprietary TypeScript/Node.js agent shipped by Anthropic. This project re-implements the same architectural patterns in Rust and Python without copying source code.</p>
+  <table>
+    <thead><tr><th>Aspect</th><th>Original Claude Code (TypeScript)</th><th>Claw Code (this repo)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Language</strong></td><td>TypeScript / Node.js</td><td>Rust (runtime) + Python (parity layer)</td></tr>
+      <tr><td><strong>License</strong></td><td>Proprietary (Anthropic)</td><td>MIT — fully open source</td></tr>
+      <tr><td><strong>Binary</strong></td><td><code>claude</code></td><td><code>claw</code></td></tr>
+      <tr><td><strong>Async model</strong></td><td>Node.js async/await throughout</td><td>Synchronous (<code>reqwest::blocking</code>, <code>std::process::Command</code>)</td></tr>
+      <tr><td><strong>Safety</strong></td><td>Runtime type checks (TS)</td><td><code>unsafe_code = "forbid"</code> workspace-wide; compile-time guarantees</td></tr>
+      <tr><td><strong>Tool count</strong></td><td>~50+ (includes internal/hidden tools)</td><td>40 exposed specs in <code>mvp_tool_specs()</code></td></tr>
+      <tr><td><strong>Bash validation</strong></td><td>18 submodules (sed, path, destructive-cmd, …)</td><td>1 consolidated module (<code>bash_validation.rs</code>) — branch-only for now</td></tr>
+      <tr><td><strong>MCP / LSP</strong></td><td>Full end-to-end runtime with stdio transport</td><td>Registry-bridge level — lifecycle modeled, not fully wired to external processes</td></tr>
+      <tr><td><strong>Plugin system</strong></td><td>Mature install/enable/disable with marketplace</td><td>Install/enable/disable/uninstall lifecycle; no marketplace</td></tr>
+      <tr><td><strong>Session storage</strong></td><td>SQLite-backed</td><td>JSONL flat files with rotation</td></tr>
+      <tr><td><strong>Config hierarchy</strong></td><td>User → Enterprise → Project → Local</td><td>User → Project → Local (no enterprise tier)</td></tr>
+      <tr><td><strong>Testing approach</strong></td><td>Jest + integration suites</td><td>Deterministic mock-Anthropic service + 10 scripted parity scenarios</td></tr>
+      <tr><td><strong>Python surface</strong></td><td>N/A</td><td>60+ module parity/introspection layer for audit and reporting</td></tr>
+    </tbody>
+  </table>
+  <div class="callout" style="margin-top:1rem">
+    <strong>Key takeaway:</strong> Claw Code targets <em>architectural parity</em> — the same tool/command surface, permission model, and agentic loop structure — but implemented from scratch in a memory-safe compiled language. Several subsystems (MCP end-to-end, bash deep validation, session compaction matching) are still in progress.
+  </div>
+</div>
+
 <!-- ─── STATS ─── -->
-<h2 id="stats">2. At a Glance — Numbers</h2>
+<h2 id="stats">3. At a Glance — Numbers</h2>
 <div class="stat-grid">
   <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Rust crates</div></div>
   <div class="stat-card"><div class="stat-num">48K</div><div class="stat-label">Rust LOC</div></div>
